@@ -34,7 +34,7 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    @Value("${token.secret}")
+    @Value("${jwt.secret}")
     private String secret;
 
     private SecretKey key;
@@ -42,7 +42,7 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
     @PostConstruct
     public void init() {
         if (secret == null || secret.isBlank()) {
-            throw new IllegalStateException("Missing required configuration property: token.secret");
+            throw new IllegalStateException("Missing required configuration property: jwt.secret");
         }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
