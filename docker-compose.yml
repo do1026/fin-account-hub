@@ -55,19 +55,9 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
       # 컨테이너 내부(INTERNAL)와 외부 접속(EXTERNAL) 분리
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: >
-        CONTROLLER:PLAINTEXT,
-        INTERNAL:PLAINTEXT,
-        EXTERNAL:PLAINTEXT
-
-      KAFKA_LISTENERS: >
-        INTERNAL://0.0.0.0:29092,
-        CONTROLLER://0.0.0.0:29093,
-        EXTERNAL://0.0.0.0:9092
-
-      KAFKA_ADVERTISED_LISTENERS: >
-        INTERNAL://kafka:29092,
-        EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_LISTENERS: "INTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,EXTERNAL://0.0.0.0:9092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:29092,EXTERNAL://localhost:9092"
 
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
 
@@ -110,7 +100,7 @@ services:
       kafka:
         condition: service_healthy
     ports:
-      - "8081:8081"
+      - "8085:8081"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka:29092"
@@ -126,3 +116,4 @@ volumes:
 networks:
   fin-network:
     driver: bridge
+    name: fin-network
