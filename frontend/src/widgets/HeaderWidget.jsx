@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { UserProfileWidget } from '../entities/UserEntity';
+import { UserProfileWidget, useAuth } from '../entities/UserEntity';
 import { notificationApi } from '../entities/NotificationEntity';
 
 export const HeaderWidget = () => {
   const location = useLocation();
+  const { user } = useAuth();
 
   const pageTitle = useMemo(() => {
     switch (location.pathname) {
@@ -21,8 +22,9 @@ export const HeaderWidget = () => {
   }, [location.pathname]);
 
   const { data: notifications = [] } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: notificationApi.getNotifications,
+    queryKey: ['notifications', user?.userId],
+    queryFn: () => notificationApi.getNotifications(user?.userId),
+    enabled: !!user?.userId,
   });
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
