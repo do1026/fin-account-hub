@@ -41,9 +41,6 @@ spring:
                 allowedHeaders: "*"
                 allowCredentials: true
 
-jwt:
-  secret: ${JWT_SECRET:fin-account-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256}
-
 eureka:
   client:
     register-with-eureka: true
