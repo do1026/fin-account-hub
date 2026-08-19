@@ -30,7 +30,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
       properties:
-        schema.registry.url: http://localhost:8081
+        schema.registry.url: http://localhost:8085
         specific.avro.reader: true
 
 eureka:
