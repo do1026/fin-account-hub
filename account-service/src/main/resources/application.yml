@@ -1,6 +1,8 @@
 spring:
   application:
     name: account-service
+  config:
+    import: "optional:configserver:http://localhost:8888"
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
@@ -19,10 +21,6 @@ spring:
 
 server:
   port: 8081
-
-jwt:
-  secret: ${JWT_SECRET:fin-account-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256}
-  expiration: 86400000
 
 springdoc:
   swagger-ui:
