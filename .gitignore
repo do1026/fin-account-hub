@@ -338,3 +338,6 @@ $RECYCLE.BIN/
 
 # Encryption keystore (never commit — Config Server decrypt key)
 *.jks
+
+# React CRA build output
+frontend/build
