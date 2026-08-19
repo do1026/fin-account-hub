@@ -17,6 +17,7 @@ spring:
 encrypt:
   key-store:
     # 로컬용 위치
-    location: file:///C:/Users/leedo/bootcamp/keystore/apiEncryptionKey.jks
+#    location: file:///C:/Users/leedo/bootcamp/keystore/apiEncryptionKey.jks
+    location: file:${KEYSTORE_PATH:/keystore/apiEncryptionKey.jks}
     password: ${KEYSTORE_PASSWORD}
     alias: apiEncryptionKey
