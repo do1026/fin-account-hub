@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  // 환경변수가 없으면 기본값으로 로컬 백엔드 주소를 사용합니다.
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
+  // baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
+  baseURL:  'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,7 +11,8 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    // 이미 'Bearer '가 붙어있으면 그대로 쓰고, 아니면 붙여서 전송
+    config.headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
   }
   return config;
 });

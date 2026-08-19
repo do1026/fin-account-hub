@@ -40,8 +40,8 @@ export const AuthFeature = () => {
   // 회원가입 뮤테이션 훅 사용
   const { mutate: handleSignup, isLoading: isSignupLoading } = useMutation({
     mutationFn: signupApi,
-    onSuccess: () => {
-      showToast('회원가입이 완료되었습니다. 로그인해 주세요.');
+    onSuccess: (res) => {
+      showToast.success(res.message || '회원가입이 완료되었습니다.');
       setTab('login');
     },
     onError: () => {

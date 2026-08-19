@@ -39,3 +39,7 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
+
+jwt:
+  secret: c2VjcmV0LWtleS1mb3ItZmluYW5jaWFsLWFjY291bnQtc2VydmljZS10ZXN0LWtleS12YWx1ZQ==
+  expiration: 86400000

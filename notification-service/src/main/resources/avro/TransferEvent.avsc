@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "TransferEvent",
+  "namespace": "com.fin.account.event",
+  "fields": [
+    {"name": "transferId", "type": "long"},
+    {"name": "status", "type": "string"},
+    {"name": "fromAccount", "type": "string"},
+    {"name": "toAccount", "type": "string"},
+    {"name": "amount", "type": "double"},
+    {"name": "transactionType", "type": "string"}
+  ]
+}
