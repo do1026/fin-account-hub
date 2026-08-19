@@ -17,10 +17,11 @@ public class HistoryService {
 
     private final HistoryRepository historyRepository;
 
-    // 히스토리 저장
+    // 히스토리 저장 (💡 userId 파라미터 추가)
     @Transactional
-    public History saveHistory(Long accountNumber, String transactionType, Long amount, Long balanceAfter, String description) {
+    public History saveHistory(Long userId, Long accountNumber, String transactionType, Long amount, Long balanceAfter, String description) {
         History history = History.builder()
+                .userId(userId) // 👈 추가된 userId 세팅
                 .accountNumber(accountNumber)
                 .transactionType(transactionType)
                 .amount(amount)
@@ -31,7 +32,15 @@ public class HistoryService {
         return historyRepository.save(history);
     }
 
-    // 계좌별 알림 목록 조회
+    // 사용자 ID 기준 알림 목록 조회 (💡 명세서 요구사항 반영)
+    public List<NotificationResponseDto> getNotificationsByUserId(Long userId) {
+        return historyRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(NotificationResponseDto::from)
+                .collect(Collectors.toList());
+    }
+
+    // (기존) 계좌별 알림 목록 조회 - 혹시 몰라 유지해 두어도 괜찮습니다.
     public List<NotificationResponseDto> getHistoryByAccount(Long accountNumber) {
         return historyRepository.findByAccountNumberOrderByCreatedAtDesc(accountNumber)
                 .stream()
@@ -39,11 +48,11 @@ public class HistoryService {
                 .collect(Collectors.toList());
     }
 
-    // 알림 읽음 상태 변경 (추가할 메서드)
+    // 알림 읽음 상태 변경
     @Transactional
     public void markAsRead(Long historyId) {
         History history = historyRepository.findById(historyId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 알림 내역이 존재하지 않습니다. id=" + historyId));
-        history.read(); // History 엔티티 내에 isRead = true 처리 메서드 필요
+        history.read();
     }
 }

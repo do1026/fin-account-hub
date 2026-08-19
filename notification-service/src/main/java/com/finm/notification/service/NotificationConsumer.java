@@ -19,18 +19,20 @@ public class NotificationConsumer {
         log.info("Received Kafka Event from transfer-events: {}", record);
 
         try {
+            // 💡 TODO: 추후 record 객체(DTO 등)에서 실제 이벤트 데이터를 추출하도록 변경하세요.
+            Long userId = 1L; // 👈 추가된 userId (임시값 지정 혹은 record에서 추출)
             Long accountNumber = 123456789L;
             String transactionType = "TRANSFER";
             Long amount = 10000L;
             Long balanceAfter = 50000L;
             String description = "계좌 이체 알림";
 
-            // 1. DB 저장
-            History savedHistory = historyService.saveHistory(accountNumber, transactionType, amount, balanceAfter, description);
+            // 1. DB 저장 (userId 파라미터 추가)
+            History savedHistory = historyService.saveHistory(userId, accountNumber, transactionType, amount, balanceAfter, description);
 
             // 2. 실시간 SSE 알림 전송
             sseEmitterService.sendNotification(accountNumber, savedHistory);
-            log.info("Successfully saved history and sent SSE notification for account: {}", accountNumber);
+            log.info("Successfully saved history and sent SSE notification for userId: {}, account: {}", userId, accountNumber);
 
         } catch (Exception e) {
             log.error("Failed to process Kafka event: {}", record, e);

@@ -25,17 +25,19 @@ public class HistoryController {
         return sseEmitterService.subscribe(accountNumber);
     }
 
-    // 계좌별 거래 내역 목록 조회
-    @GetMapping("/history/{accountNumber}")
-    public ResponseEntity<List<NotificationResponseDto>> getHistory(@PathVariable Long accountNumber) {
-        List<NotificationResponseDto> response = historyService.getHistoryByAccount(accountNumber);
+    // 💡 1. 사용자 기준 알림 목록 조회 (GET /api/notifications)
+    // 기존 /history/{accountNumber} 경로 삭제 및 명세서(사용자 ID 기반) 규격에 맞춤
+    @GetMapping
+    public ResponseEntity<List<NotificationResponseDto>> getNotifications(@RequestParam Long userId) {
+        List<NotificationResponseDto> response = historyService.getNotificationsByUserId(userId);
         return ResponseEntity.ok(response);
     }
 
-    // 읽음 상태 처리 API
-    @PatchMapping("/history/{historyId}/read")
-    public ResponseEntity<Void> markAsRead(@PathVariable Long historyId) {
-        historyService.markAsRead(historyId);
+    // 💡 2. 알림 읽음 처리 API (PATCH /api/notifications/{notificationId}/read)
+    // 기존 /history/{historyId}/read 에서 /history 경로 제거
+    @PatchMapping("/{notificationId}/read")
+    public ResponseEntity<Void> markAsRead(@PathVariable Long notificationId) {
+        historyService.markAsRead(notificationId);
         return ResponseEntity.ok().build();
     }
 }
