@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { TransferTableRow, transferApi } from '../entities/TransferEntity';
-import { NotificationItem, notificationApi } from '../entities/NotificationEntity.jsx';
+import { useAuth } from '../entities/UserEntity';
+import { NotificationItem, notificationApi } from '../entities/NotificationEntity';
 import { NotificationReadButton } from '../features/NotificationReadFeature';
 
 const renderTransfers = (transfers, isLoading, isError) => {
@@ -23,22 +24,31 @@ const renderNotifications = (notifications, isLoading, isError) => {
 
 export const HistoryPage = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const defaultTab = location.state?.defaultTab || 'transfers';
   const [tab, setTab] = useState(defaultTab);
 
   const { data: transfers = [], isLoading: isLoadingTransfers, isError: isErrorTransfers } = useQuery({
-    queryKey: ['transfers'],
-    queryFn: transferApi.getTransfers,
-    retry: 1, // API 실패 시 재시도를 1번만 하도록 설정
+    queryKey: ['transfers', user?.userId],
+    queryFn: () => transferApi.getTransfers(user?.userId), // 필요에 따라 파라미터 전달 확인
+    retry: 1,
+    enabled: !!user?.userId,
   });
 
   const { data: notifications = [], isLoading: isLoadingNotifications, isError: isErrorNotifications } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: notificationApi.getNotifications,
-    retry: 1, // API 실패 시 재시도를 1번만 하도록 설정
+    queryKey: ['notifications', user?.userId],
+    queryFn: () => notificationApi.getNotifications(user?.userId),
+    retry: 1,
+    enabled: !!user?.userId, 
   });
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  // 최신순으로 정렬
+  const sortedTransfers = [...transfers].sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
+  const sortedNotifications = [...notifications].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+
+  const unreadCount = sortedNotifications.filter((n) => !n.isRead).length;
+
 
   return (
     <div className="fade-in space-y-6 w-full">
@@ -71,7 +81,7 @@ export const HistoryPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
-                {renderTransfers(transfers, isLoadingTransfers, isErrorTransfers)}
+                {renderTransfers(sortedTransfers, isLoadingTransfers, isErrorTransfers)}
               </tbody>
             </table>
           </div>
@@ -80,7 +90,7 @@ export const HistoryPage = () => {
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
           <h3 className="font-bold text-slate-800 text-sm mb-4 border-b border-slate-100 pb-3">실시간 서비스 알림 피드</h3>
           <div className="space-y-3">
-            {renderNotifications(notifications, isLoadingNotifications, isErrorNotifications)}
+            {renderNotifications(sortedNotifications, isLoadingNotifications, isErrorNotifications)}
           </div>
         </div>
       )}

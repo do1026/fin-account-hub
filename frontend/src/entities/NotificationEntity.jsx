@@ -2,8 +2,10 @@ import React from 'react';
 import { api } from '../shared/api';
 
 export const notificationApi = {
-  getNotifications: async () => {
-    const res = await api.get('/notifications');
+  getNotifications: async (userId) => { // 👈 userId를 인자로 받습니다.
+    const res = await api.get('/notifications', {
+      params: { userId } // 👈 쿼리 파라미터로 전달
+    });
     return res.data;
   },
   markAsRead: async (notificationId) => {

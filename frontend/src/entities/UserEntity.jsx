@@ -13,8 +13,10 @@ export const AuthProvider = ({ children }) => {
     const updated = { ...userData, isLoggedIn: true };
     setUser(updated);
     localStorage.setItem('user', JSON.stringify(updated));
-    // api.js 인터셉터와 동일한 키 사용
-    localStorage.setItem('authToken', userData.token);
+    
+    // 'Bearer '가 실수로 포함되어 들어와도 순수 토큰만 추출해서 저장
+    const rawToken = userData.token ? userData.token.replace(/^Bearer\s+/i, '') : '';
+    localStorage.setItem('authToken', rawToken);
   };
 
   const logout = () => {
