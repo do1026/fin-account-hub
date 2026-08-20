@@ -26,7 +26,9 @@ export const HeaderWidget = () => {
     queryFn: () => notificationApi.getNotifications(user?.userId),
     enabled: !!user?.userId,
   });
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  // 👉 백엔드 필드명인 read로 수정 (!n.isRead -> !n.read)
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm z-10">

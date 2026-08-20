@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { transferApi } from '../entities/TransferEntity';
+import { useAuth } from '../entities/UserEntity';
 import { showToast } from '../shared/Toast';
 
 export const TransferExecuteForm = ({ accounts }) => {
@@ -8,14 +9,26 @@ export const TransferExecuteForm = ({ accounts }) => {
   const [toAccount, setToAccount] = useState('');
   const [amount, setAmount] = useState('');
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { mutate: executeTransaction, isLoading } = useMutation({
     mutationFn: transferApi.transfer,
     onSuccess: () => {
       showToast.success('계좌 이체가 성공적으로 처리되었습니다.');
-      // 계좌 목록과 거래 내역 데이터를 새로고침하도록 무효화
+      
+      // 계좌 및 거래내역 갱신
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['transfers'] });
+
+      // 👉 백엔드가 카프카를 통해 알림을 DB에 적재할 시간을 0.6초 정도 준 뒤
+      // 헤더와 알림 관련 모든 쿼리를 강제로 재조회(Refetch)시킵니다.
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['notifications'] });
+        if (user?.userId) {
+          queryClient.refetchQueries({ queryKey: ['notifications', user.userId] });
+        }
+      }, 600);
+
       // 폼 초기화
       setFromAccount('');
       setToAccount('');

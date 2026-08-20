@@ -53,6 +53,10 @@ public class HistoryService {
     public void markAsRead(Long historyId) {
         History history = historyRepository.findById(historyId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 알림 내역이 존재하지 않습니다. id=" + historyId));
+
         history.read();
+
+        // 👉 명시적으로 save를 호출하여 변경 사항을 확실히 DB에 반영합니다.
+        historyRepository.save(history);
     }
 }

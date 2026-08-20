@@ -3,8 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { TransferTableRow, transferApi } from '../entities/TransferEntity';
 import { useAuth } from '../entities/UserEntity';
-import { NotificationItem, notificationApi } from '../entities/NotificationEntity';
-import { NotificationReadButton } from '../features/NotificationReadFeature';
+import { notificationApi } from '../entities/NotificationEntity';
+import { NotificationListItem } from '../features/NotificationReadFeature';
 
 const renderTransfers = (transfers, isLoading, isError) => {
   if (isLoading) return <tr><td colSpan="7" className="p-6 text-center text-slate-400 text-xs">거래 내역을 불러오는 중...</td></tr>;
@@ -19,7 +19,7 @@ const renderNotifications = (notifications, isLoading, isError) => {
   if (isError) return <div className="p-6 text-center text-rose-500 text-xs">알림을 불러오는 데 실패했습니다.</div>;
   if (notifications.length === 0) return <div className="p-6 text-center text-slate-400 text-xs">새로운 알림이 없습니다.</div>;
 
-  return notifications.map((n) => <NotificationItem key={n.notificationId} notification={n} actionButton={<NotificationReadButton notificationId={n.notificationId} />} />);
+  return notifications.map((n) => <NotificationListItem key={n.id} notification={n} />);
 };
 
 export const HistoryPage = () => {
@@ -30,7 +30,7 @@ export const HistoryPage = () => {
 
   const { data: transfers = [], isLoading: isLoadingTransfers, isError: isErrorTransfers } = useQuery({
     queryKey: ['transfers', user?.userId],
-    queryFn: () => transferApi.getTransfers(user?.userId), // 필요에 따라 파라미터 전달 확인
+    queryFn: () => transferApi.getTransfers(user?.userId),
     retry: 1,
     enabled: !!user?.userId,
   });
@@ -46,9 +46,8 @@ export const HistoryPage = () => {
   const sortedTransfers = [...transfers].sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
   const sortedNotifications = [...notifications].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-
-  const unreadCount = sortedNotifications.filter((n) => !n.isRead).length;
-
+  // 👉 백엔드 필드명인 read로 수정 (!n.isRead -> !n.read)
+  const unreadCount = sortedNotifications.filter((n) => !n.read).length;
 
   return (
     <div className="fade-in space-y-6 w-full">
