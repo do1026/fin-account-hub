@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "TransferEventAvro",
+  "namespace": "com.finm.avro",
+  "fields": [
+    { "name": "transferId", "type": { "type": "string", "avro.java.string": "String" } },
+    { "name": "transactionType", "type": { "type": "string", "avro.java.string": "String" } },
+    { "name": "fromAccount", "type": { "type": "string", "avro.java.string": "String" } },
+    { "name": "toAccount", "type": { "type": "string", "avro.java.string": "String" } },
+    { "name": "amount", "type": "long" },
+    { "name": "status", "type": { "type": "string", "avro.java.string": "String" } }
+  ]
+}

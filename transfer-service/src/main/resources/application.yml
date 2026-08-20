@@ -20,10 +20,11 @@ spring:
     bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    # Schema Registry를 사용하지 않는다면 아래 properties는 제거하거나 주석 처리 가능
-    # properties:
-    #   schema.registry.url: http://localhost:8081
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        "schema.registry.url": http://localhost:8085
+    properties:
+      "schema.registry.url": http://localhost:8085
 
 eureka:
   client:

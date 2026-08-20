@@ -52,8 +52,10 @@ public class TransferServiceImpl implements TransferService {
             log.error("[TransferService] Deposit failed for account: {}", request.getToAccount(), e);
             // 거래 실패 처리
             transfer.markFailed(e.getMessage());
-            transferRepository.save(transfer);
-            throw new RuntimeException("입금 처리에 실패했습니다: " + e.getMessage(), e);
+            Transfer savedFailedTransfer = transferRepository.save(transfer);
+
+            // 입금 실패 시에도 실패 이벤트 Kafka 발행
+            transferProducerService.send(TOPIC_TRANSFER_EVENTS, TransferResponse.from(savedFailedTransfer));
         }
 
         // DB 저장
@@ -86,9 +88,12 @@ public class TransferServiceImpl implements TransferService {
             transfer.markCompleted();
         } catch (Exception e) {
             log.error("[TransferService] Withdraw failed for account: {}", request.getFromAccount(), e);
-            // 거래 실패 처리
+        // 거래 실패 처리
             transfer.markFailed(e.getMessage());
-            transferRepository.save(transfer);
+            Transfer savedFailedTransfer = transferRepository.save(transfer);
+
+            // 출금 실패 시에도 실패 이벤트 Kafka 발행
+            transferProducerService.send(TOPIC_TRANSFER_EVENTS, TransferResponse.from(savedFailedTransfer));
             throw new RuntimeException("출금 처리에 실패했습니다: " + e.getMessage(), e);
         }
 
@@ -120,9 +125,12 @@ public class TransferServiceImpl implements TransferService {
             accountServiceClient.withdrawBalance(request.getFromAccount(), request.getAmount());
         } catch (Exception e) {
             log.error("[TransferService] Withdrawal step failed: fromAccount={}", request.getFromAccount(), e);
-            // 출금 실패 처리 및 저장 후 예외 전파
+        // 출금 실패 처리 및 저장 후 예외 전파
             transfer.markFailed("출금 실패: " + e.getMessage());
-            transferRepository.save(transfer);
+            Transfer savedFailedTransfer = transferRepository.save(transfer);
+
+            // 출금 단계 실패 시 실패 이벤트 Kafka 발행
+            transferProducerService.send(TOPIC_TRANSFER_EVENTS, TransferResponse.from(savedFailedTransfer));
             throw new RuntimeException("출금 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
 
@@ -144,8 +152,10 @@ public class TransferServiceImpl implements TransferService {
                         request.getFromAccount(), compensationEx);
                 transfer.markFailed("입금 실패 및 보상 트랜잭션 실패 (수동 정산 필요): " + compensationEx.getMessage());
             }
+            Transfer savedFailedTransfer = transferRepository.save(transfer);
 
-            transferRepository.save(transfer);
+            // 입금 실패 및 보상 트랜잭션 처리 후 실패 이벤트 Kafka 발행
+            transferProducerService.send(TOPIC_TRANSFER_EVENTS, TransferResponse.from(savedFailedTransfer));
             throw new RuntimeException("이체 처리 중 오류가 발생하여 출금 금액이 원복되었습니다: " + e.getMessage(), e);
         }
 
