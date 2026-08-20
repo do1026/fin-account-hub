@@ -335,3 +335,9 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,java,macos,windows,node,maven,dotenv
+
+# Encryption keystore (never commit — Config Server decrypt key)
+*.jks
+
+# React CRA build output
+frontend/build

@@ -30,18 +30,17 @@ export const AuthFeature = () => {
       login({ userId: data.userId, name: data.name, email, token: data.token });
       showToast.success('로그인 성공! JWT 토큰이 발급되었습니다.');
     },
-    onError: () => {
-      // Mock 처리
-      login({ userId: 1, name: email.split('@')[0], email, token: 'mock-jwt-token' });
-      showToast.success('로그인 완료 (Mock 처리)');
+    onError: (error) => {
+      const errorMessage = error.response?.data?.message || '이메일 또는 비밀번호가 올바르지 않습니다.';
+      showToast.error(errorMessage);
     },
   });
   
   // 회원가입 뮤테이션 훅 사용
   const { mutate: handleSignup, isLoading: isSignupLoading } = useMutation({
     mutationFn: signupApi,
-    onSuccess: () => {
-      showToast('회원가입이 완료되었습니다. 로그인해 주세요.');
+    onSuccess: (res) => {
+      showToast.success(res.message || '회원가입이 완료되었습니다.');
       setTab('login');
     },
     onError: () => {
