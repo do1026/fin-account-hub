@@ -35,6 +35,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     @Transactional
     public TransferResponse deposit(DepositRequest request) {
+
         // 엔티티 생성 (초기 상태 - REQUESTED)
         Transfer transfer = Transfer.builder()
                 .transactionType(TransactionType.DEPOSIT)
@@ -112,6 +113,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     @Transactional
     public TransferResponse transfer(TransferRequest request) {
+
         // 엔티티 생성
         Transfer transfer = Transfer.builder()
                 .transactionType(TransactionType.TRANSFER)

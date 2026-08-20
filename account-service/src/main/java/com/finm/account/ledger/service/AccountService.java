@@ -103,4 +103,12 @@ public class AccountService {
 
         account.withdraw(amount);
     }
+
+    public Long getUserIdByAccountNumber(String accountNumber) {
+        // 하이픈이 있든 없든 무시하고 찾아주는 쿼리 호출
+        AccountEntity account = accountRepository.findByAccountNumberIgnoreHyphen(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException("해당 계좌가 존재하지 않습니다: " + accountNumber));
+
+        return account.getUserId();
+    }
 }

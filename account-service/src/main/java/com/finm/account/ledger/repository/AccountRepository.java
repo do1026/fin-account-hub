@@ -1,6 +1,8 @@
 package com.finm.account.ledger.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.finm.account.ledger.entity.AccountEntity;
@@ -23,4 +25,8 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
 
     // 계좌번호로 계좌 정보 단건 조회 (입/출금 처리용)
     Optional<AccountEntity> findByAccountNumber(String accountNumber);
+
+    // 하이픈 유무에 상관없이 숫자만 일치하면 조회하는 쿼리
+    @Query("SELECT a FROM AccountEntity a WHERE REPLACE(a.accountNumber, '-', '') = REPLACE(:accountNumber, '-', '')")
+    Optional<AccountEntity> findByAccountNumberIgnoreHyphen(@Param("accountNumber") String accountNumber);
 }

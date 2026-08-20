@@ -1,7 +1,10 @@
 package com.finm.notification.service;
 
 import com.finm.avro.TransferEventAvro;
+import com.finm.notification.client.AccountServiceClient;
 import com.finm.notification.domain.History;
+
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -14,6 +17,7 @@ public class NotificationConsumer {
 
     private final HistoryService historyService;
     private final SseEmitterService sseEmitterService;
+    private final AccountServiceClient accountServiceClient;
 
     @KafkaListener(topics = "transfer-events", groupId = "notification-group")
     public void consumeTransferEvent(TransferEventAvro event) {
@@ -31,7 +35,18 @@ public class NotificationConsumer {
             Long accountNumber = !fromAccount.isEmpty()
                     ? Long.parseLong(fromAccount.replaceAll("[^0-9]", ""))
                     : 123456789L;
-            Long userId = 1L; // 기본 사용자 ID (필요시 토큰 또는 계좌 서비스 매핑)
+            Long userId = null; // 기본 사용자 ID (필요시 토큰 또는 계좌 서비스 매핑)
+            try {
+                if (!fromAccount.isEmpty()) {
+                    // 💡 account-service로 넘길 때 하이픈이 포함된 형태로 변환해야 할 수도 있습니다.
+                    // 현재 DB에는 '110-431-735768' 형태로 저장되어 있으므로, 만약 전달된 값이 '110431735768'이라면
+                    // account-service에서 정확히 매칭되지 않을 수 있습니다.
+                    userId = accountServiceClient.getUserIdByAccountNumber(fromAccount);
+                    log.info("[Feign 성공] 계좌 {}의 userId = {}", fromAccount, userId);
+                }
+            } catch (Exception e) {
+                log.error("[Feign 실패] 유저 ID 조회 중 에러 발생: {}", e.getMessage());
+            }
 
             // 2. 알림 메시지 생성
             String description = "SUCCESS".equalsIgnoreCase(status) || "COMPLETED".equalsIgnoreCase(status)

@@ -64,4 +64,12 @@ public class AccountController {
         accountService.withdraw(accountNumber, amount);
         return ResponseEntity.ok(ApiResponse.success("출금이 완료되었습니다."));
     }
+
+    @Operation(summary = "계좌번호로 소유자 ID 조회", description = "계좌번호를 기반으로 소유자의 사용자 ID를 조회합니다.")
+    @GetMapping("/owner/{accountNumber}")
+    public Long getUserIdByAccountNumber(
+            @Parameter(description = "계좌 번호", required = true) @PathVariable String accountNumber) {
+        // ApiResponse로 감싸지 않고 Long 값을 바로 리턴
+        return accountService.getUserIdByAccountNumber(accountNumber);
+    }
 }

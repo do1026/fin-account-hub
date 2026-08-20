@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransferRequest {
+    private Long userId;
     private String fromAccount;
     private String toAccount;
     private Long amount;

@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TransferResponse {
     private String transferId;
+
     private TransactionType transactionType;
     private String fromAccount;
     private String toAccount;
