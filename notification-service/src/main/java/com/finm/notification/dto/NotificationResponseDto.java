@@ -17,6 +17,9 @@ public class NotificationResponseDto {
     private String description;
     private LocalDateTime createdAt;
 
+    // 👉 읽음 여부를 전달할 필드 추가
+    private boolean read;
+
     public static NotificationResponseDto from(History entity) {
         return NotificationResponseDto.builder()
                 .id(entity.getId())
@@ -26,6 +29,7 @@ public class NotificationResponseDto {
                 .balanceAfter(entity.getBalanceAfter())
                 .description(entity.getDescription())
                 .createdAt(entity.getCreatedAt())
+                .read(entity.isRead()) // 👉 엔티티의 isRead 값을 DTO의 read로 매핑
                 .build();
     }
 }
